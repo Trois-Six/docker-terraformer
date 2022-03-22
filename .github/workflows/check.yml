@@ -14,7 +14,7 @@ jobs:
           echo ::set-output name=IMAGE_EXIST::$(curl -s -o /dev/null -w "%{http_code}" "https://registry.hub.docker.com/v2/repositories/troissixzero/terraformer/tags/${LAST_COMMITID::7}/")
       - name: Dispatch
         if: ${{ steps.check.outputs.IMAGE_EXIST == '404' }}
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.PAT_TOKEN }}
           event-type: buildAndPush
