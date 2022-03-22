@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Check out the Terraformer repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: terraformer-repo
           repository: GoogleCloudPlatform/terraformer
@@ -20,28 +20,28 @@ jobs:
         id: prepare
         run: |
           TERRAFORMER_SHA=$(git -C terraformer-repo rev-parse HEAD)
-          echo ::set-output name=IMAGE_TAG::${TERRAFORMER_SHA::7}
+          echo IMAGE_TAG=${TERRAFORMER_SHA::7} >> $GITHUB_OUTPUT
           git -C terraformer-repo fetch --prune --unshallow
-          echo ::set-output name=TERRAFORMER_TAG::$(git -C terraformer-repo describe --tags HEAD)
+          echo TERRAFORMER_TAG=$(git -C terraformer-repo describe --tags HEAD) >> $GITHUB_OUTPUT
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         id: builder
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
       - name: Cache Docker layers
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push docker image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         id: docker_build
         with:
           context: .
@@ -54,7 +54,7 @@ jobs:
             troissixzero/terraformer:${{ steps.prepare.outputs.IMAGE_TAG }}
             troissixzero/terraformer:${{ steps.prepare.outputs.TERRAFORMER_TAG }}
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
       # This ugly bit is necessary if you don't want your cache to grow forever
       # till it hits GitHub's limit of 5GB.
       # Temp fix
