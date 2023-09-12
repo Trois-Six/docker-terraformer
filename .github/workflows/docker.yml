@@ -24,7 +24,7 @@ jobs:
           git -C terraformer-repo fetch --prune --unshallow
           echo ::set-output name=TERRAFORMER_TAG::$(git -C terraformer-repo describe --tags HEAD)
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         id: builder
         uses: docker/setup-buildx-action@v1
