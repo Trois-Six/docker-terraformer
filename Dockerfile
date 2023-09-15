@@ -1,7 +1,8 @@
-FROM golang:1.16-alpine AS build
+FROM golang:1.21-alpine AS build
 COPY terraformer-repo/ /tmp/terraformer/
 WORKDIR /tmp/terraformer
-RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go mod download && \
+RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go mod tidy && \
+    GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go mod download && \
     GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -v -ldflags '-w -s'
 
 FROM alpine:latest
