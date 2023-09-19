@@ -16,5 +16,4 @@ jobs:
         if: ${{ steps.check.outputs.IMAGE_EXIST == '404' }}
         uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ secrets.PAT_TOKEN }}
           event-type: buildAndPush
